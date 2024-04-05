@@ -2,17 +2,14 @@ import ProfileForm from "@/components/forms/profile-form";
 import React from "react";
 import UserProfilePicture from "./_components/userProfilePicture";
 import { db } from "@/lib/db";
+import { currentUser } from "@clerk/nextjs";
 
 type Props = {};
 
-const page = (props: Props) => {
-  const removeProfileImage = async () => {
-    const res = await db.user.update({
-      where: { clerkId: "" },
-      data: { profileImage: "" },
-    });
-    return res;
-  };
+const page = async (props: Props) => {
+  const authUser = await currentUser();
+  if (!authUser) return;
+  const user = await db.user.findUnique({ where: { clerkId: authUser.id } });
 
   return (
     <div className="flex flex-col gap-4">
@@ -20,9 +17,8 @@ const page = (props: Props) => {
         <span>Settings</span>
       </h1>
       <UserProfilePicture
-        onDelete={removeProfileImage}
+        authId={authUser.id}
         userImage={user?.profileImage || ""}
-        onUpload={uploadProfileImage}
       ></UserProfilePicture>
       <div className="flex flex-col gap-10 p-6">
         <div className="">
