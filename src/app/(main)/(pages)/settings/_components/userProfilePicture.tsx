@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import Image from "next/image";
 import React from "react";
+import UploadCareButton from "./uploadCareButton";
 
 type Props = {
   userImage: string | null;
@@ -65,7 +66,7 @@ const UserProfilePicture = ({ authId, userImage }: Props) => {
             </button>
           </div>
         </div>
-        <Button onClick={() => uploadProfileImage}>Upload image</Button>
+        <UploadCareButton onUpload={uploadProfileImage} />
       </div>
     </div>
   );

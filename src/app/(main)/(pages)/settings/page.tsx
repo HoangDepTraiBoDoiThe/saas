@@ -9,7 +9,17 @@ type Props = {};
 const page = async (props: Props) => {
   const authUser = await currentUser();
   if (!authUser) return;
+
   const user = await db.user.findUnique({ where: { clerkId: authUser.id } });
+
+  const updateUserInfo = async (userName: string) => {
+    await db.user
+      .update({
+        where: { clerkId: authUser.id },
+        data: { name: userName },
+      })
+      .catch((err) => console.error(err));
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -27,7 +37,7 @@ const page = async (props: Props) => {
             Add or update your information
           </p>
         </div>
-        <ProfileForm />
+        <ProfileForm user={user && user} onUpdate={updateUserInfo} />
       </div>
     </div>
   );

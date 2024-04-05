@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -17,26 +17,34 @@ import { Input } from "../ui/input";
 import { userSchema } from "@/lib/types";
 import { Loader, Loader2 } from "lucide-react";
 
-type Props = {};
+type Props = {
+  user: any;
+  onUpdate: (userName: string) => Promise<void>;
+};
 
 const ProfileForm = (props: Props) => {
+  const { user, onUpdate } = props;
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof userSchema>>({
     mode: "onChange",
     resolver: zodResolver(userSchema),
     defaultValues: {
-      userName: "",
-      email: "",
+      userName: user.name,
+      email: user.email,
     },
   });
 
-  // 2. Define a submit handler.
-  const onSubmit = (values: z.infer<typeof userSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+  const onSubmit = async (values: z.infer<typeof userSchema>) => {
+    setIsLoading(true);
+    await onUpdate(values.userName);
+    setIsLoading(false);
     console.log(values);
   };
+
+  useEffect(() => {
+    form.reset({ userName: user.name, email: user.email });
+  }, [user]);
 
   return (
     <Form {...form}>
@@ -53,9 +61,7 @@ const ProfileForm = (props: Props) => {
               <FormControl>
                 <Input placeholder="shadcn" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
+              <FormDescription></FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -70,9 +76,7 @@ const ProfileForm = (props: Props) => {
               <FormControl>
                 <Input placeholder="shadcn" type="email" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
+              <FormDescription></FormDescription>
               <FormMessage />
             </FormItem>
           )}
